@@ -1,14 +1,17 @@
 {
   "name": "jtwc-archiver",
+  "preferGlobal": "true",
   "version": "1.0.2",
   "description": "Archives the JTWC product files.",
   "main": "index.js",
-  "bin": "jtwc-archiver",
   "dependencies": {
     "axios": "^0.20.0",
     "cheerio": "^1.0.0-rc.3",
     "fs-jetpack": "^3.1.0",
     "moment": "^2.29.0"
+  },
+  "bin": {
+    "jtwc-archiver": "./bin/jtwc-archiver"
   },
   "devDependencies": {},
   "scripts": {
