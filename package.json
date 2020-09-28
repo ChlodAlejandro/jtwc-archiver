@@ -2,7 +2,7 @@
   "name": "jtwc-archiver",
   "version": "1.0.2",
   "description": "Archives the JTWC product files.",
-  "bin": "node jtwc-archiver.js",
+  "bin": "jtwc-archiver",
   "dependencies": {
     "axios": "^0.20.0",
     "cheerio": "^1.0.0-rc.3",
