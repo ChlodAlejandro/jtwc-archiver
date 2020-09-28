@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Archives the JTWC product files.",
   "main": "jtwc-archiver.js",
+  "bin": "jtwc-archiver.js",
   "dependencies": {
     "axios": "^0.20.0",
     "cheerio": "^1.0.0-rc.3",
