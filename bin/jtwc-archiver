@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require(__dirname + "/../jtwc-archiver.js");
+require(__dirname + "/../index.js");
