@@ -1,0 +1,33 @@
+{
+  "name": "jtwc-archiver",
+  "version": "1.0.0",
+  "description": "Archives the JTWC product files.",
+  "main": "jtwc-archiver.js",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "cheerio": "^1.0.0-rc.3",
+    "fs-jetpack": "^3.1.0",
+    "moment": "^2.29.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ChlodAlejandro/jtwc-archiver.git"
+  },
+  "keywords": [
+    "jtwc",
+    "typhoon",
+    "emergency",
+    "archive",
+    "web-scraper"
+  ],
+  "author": "Chlod Alejandro",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ChlodAlejandro/jtwc-archiver/issues"
+  },
+  "homepage": "https://github.com/ChlodAlejandro/jtwc-archiver#readme"
+}
