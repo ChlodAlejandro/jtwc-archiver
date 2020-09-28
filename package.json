@@ -2,8 +2,6 @@
   "name": "jtwc-archiver",
   "version": "1.0.2",
   "description": "Archives the JTWC product files.",
-  "main": "jtwc-archiver.js",
-  "bin": "node jtwc-archiver.js",
   "dependencies": {
     "axios": "^0.20.0",
     "cheerio": "^1.0.0-rc.3",
@@ -13,7 +11,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node jtwc-archiver.js"
+    "start": "node jtwc-archiver.js",
+    "jtwc-archiver": "node jtwc-archiver.js"
   },
   "repository": {
     "type": "git",
