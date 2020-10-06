@@ -1,7 +1,7 @@
 {
   "name": "jtwc-archiver",
   "preferGlobal": "true",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Archives the JTWC product files.",
   "main": "index.js",
   "dependencies": {
@@ -15,9 +15,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "jtwc-archiver": "node index.js"
+    "jtwc-archiver": "node index.js",
+    "clean": "node clean.js"
   },
   "repository": {
     "type": "git",

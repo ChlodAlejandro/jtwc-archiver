@@ -22,9 +22,14 @@ const moment = require("moment");
  *      |  +- latest-wp1520web.txt            // Latest product file
  *      |  
  *      +- gif             // GIF products (*.gif)
+ *      |  |
+ *      |  +- 2020-09-29-160000-wp1520.gif // Example file
+ *      |  +- latest-wp1520.gif            // Latest product file
+ *      |
+ *      +- prog            // Prognostic reasoning archives
  *         |
- *         +- 2020-09-29-160000-wp1520.gif // Example file
- *         +- latest-wp1520.gif            // Latest product file
+ *         +- 2020-09-29-160000-wp1520prog.txt // Example file
+ *         +- latest-wp1520prog.txt            // Latest product file
  * 
  * Dedicated to the Wikipedia WikiProject Tropical Cyclones.
  * https://en.wikipedia.org/wiki/WP:WPTC
@@ -78,69 +83,42 @@ const app = (async () => {
     const saveTime = moment().utc().format("YYYY[-]MM[-]DD[-]HHmm");
     console.log(`Writing for ${saveTime}`);
     
-    const textPath = path.join("jtwc_products", "text");
-    let textProductRegex = /https:\/\/.+?([^/]+web\.txt)/gi;
-    let textProduct = null;
-    fs.dir(path.join("jtwc_products", "text"));
-    while ((textProduct = textProductRegex.exec(data)) != null) {
-        try {
-            console.log(`Archiving ${textProduct[0]} to ${textProduct[1]}`);
-            const productData = await axios(textProduct[0], {responseType: "arraybuffer"});
-            
-            const latest = path.join(textPath, `latest-${textProduct[1].replace(/^[.A-Z0-9\-]/g, "_")}`);
-            if (fs.exists(latest)) {
-                const latestContent = fs.read(latest, "utf8");
-                if (latestContent === Buffer.from(productData.data).toString("utf8")) {
-                    console.log("Content is identical. Skipping...");
-                    continue;
+    const archiveMatches = async (output, regex) => {
+        const outPath = path.join("jtwc_products", output);
+        let product = null;
+        fs.dir(path.join("jtwc_products", "text"));
+        while ((product = regex.exec(data)) != null) {
+            try {
+                console.log(`Archiving ${product[0]} to ${product[1]}`);
+                const productData = await axios(product[0], {responseType: "arraybuffer"});
+                
+                const latest = path.join(outPath, `latest-${product[1].replace(/^[.A-Z0-9\-]/g, "_")}`);
+                if (fs.exists(latest)) {
+                    const latestContent = fs.read(latest, "utf8");
+                    if (latestContent === Buffer.from(productData.data).toString("utf8")) {
+                        console.log("Content is identical. Skipping...");
+                        continue;
+                    }
                 }
+                
+                fs.write(
+                    path.join(outPath, `${saveTime}-${product[1].replace(/^[.A-Z0-9\-]/g, "_")}`), 
+                    productData.data
+                );
+                
+                fs.write(
+                    path.join(outPath, `latest-${product[1].replace(/^[.A-Z0-9\-]/g, "_")}`), 
+                    productData.data
+                );
+            } catch (e) {
+                console.error("Failed to download product.");
             }
-            
-            fs.write(
-                path.join(textPath, `${saveTime}-${textProduct[1].replace(/^[.A-Z0-9\-]/g, "_")}`), 
-                productData.data
-            );
-            
-            fs.write(
-                path.join(textPath, `latest-${textProduct[1].replace(/^[.A-Z0-9\-]/g, "_")}`), 
-                productData.data
-            );
-        } catch (e) {
-            console.error("Failed to download product.");
         }
-    }
+    };
     
-    const gifPath = path.join("jtwc_products", "gif");
-    let gifProductRegex = /https:\/\/.+?([^/]+\.gif)/gi;
-    let gifProduct = null;
-    fs.dir(path.join("jtwc_products", "gif"));
-    while ((gifProduct = gifProductRegex.exec(data)) != null) {
-        try {
-            console.log(`Archiving ${gifProduct[0]} to ${gifProduct[1]}`);
-            const productData = await axios(gifProduct[0], {responseType: "arraybuffer"});
-            
-            const latest = path.join(gifPath, `latest-${gifProduct[1].replace(/^[.A-Z0-9\-]/g, "_")}`);
-            if (fs.exists(latest)) {
-                const latestContent = fs.read(latest, "utf8");
-                if (latestContent === Buffer.from(productData.data).toString("utf8")) {
-                    console.log("Content is identical. Skipping...");
-                    continue;
-                }
-            }
-            
-            fs.write(
-                path.join(gifPath, `${saveTime}-${gifProduct[1].replace(/^[.A-Z0-9\-]/g, "_")}`), 
-                productData.data
-            );
-            
-            fs.write(
-                path.join(gifPath, `latest-${gifProduct[1].replace(/^[.A-Z0-9\-]/g, "_")}`), 
-                productData.data
-            );
-        } catch (e) {
-            console.error("Failed to download product.");
-        }
-    }
+    await archiveMatches("text", /https:\/\/.+?([^/]+web\.txt)/gi);  // TC Warning 
+    await archiveMatches("gif", /https:\/\/.+?([^/]+\.gif)/gi);      // TC Graphic
+    await archiveMatches("prog", /https:\/\/.+?([^/]+prog\.txt)/gi); // Prognostic Reasoning
     
     // Purge files older than 6 months
     const purgeDirectory = (givenPath) => {
