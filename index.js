@@ -31,7 +31,7 @@ const moment = require("moment");
  *         +- 2020-09-29-160000-wp1520prog.txt // Example file
  *         +- latest-wp1520prog.txt            // Latest product file
  * 
- * Dedicated to the Wikipedia WikiProject Tropical Cyclones.
+ * Dedicated to WikiProject Tropical cyclones.
  * https://en.wikipedia.org/wiki/WP:WPTC
  * 
  * @author Chlod Alejandro
@@ -39,7 +39,6 @@ const moment = require("moment");
 **/
 const app = (async () => {
     const JTWC_RSS = "https://www.metoc.navy.mil/jtwc/rss/jtwc.rss";
-    const BACKLOG_LENGTH = 15768000000;
     
     const request = await axios(`${JTWC_RSS}?${Date.now()}`);
     const data = request.data
@@ -119,24 +118,7 @@ const app = (async () => {
     await archiveMatches("text", /https:\/\/.+?([^/]+web\.txt)/gi);  // TC Warning 
     await archiveMatches("gif", /https:\/\/.+?([^/]+\.gif)/gi);      // TC Graphic
     await archiveMatches("prog", /https:\/\/.+?([^/]+prog\.txt)/gi); // Prognostic Reasoning
-    
-    // Purge files older than 6 months
-    const purgeDirectory = (givenPath) => {
-        const contents = fs.inspectTree(givenPath, {times: true, relativePath: true});
-        
-        for (const fsobj of contents.children) {
-            if (fsobj.type === "dir")
-                purgeDirectory(path.join(givenPath, fsobj.name));
-            else {
-                const age = Date.now() - (new Date(fsobj.modifyTime)).getTime()
-                if (age > BACKLOG_LENGTH) {
-                    console.log(`Deleting ${fsobj.name} (${moment(fsobj.modifyTime).fromNow()} old)...`);
-                    fs.remove(path.join(givenPath, fsobj.name));
-                }
-            }
-        }
-    };
-    purgeDirectory("jtwc_products");
+    await archiveMatches("jmv", /https:\/\/.+?([^/]+\.tcw)/gi);     // JMV 3.0 Data
     
     console.log("Archiving success.");
 });
