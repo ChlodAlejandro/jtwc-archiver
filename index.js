@@ -5,6 +5,9 @@ const path = require("path");
 const moment = require("moment");
 const SocksProxyAgent = require("axios-socks5-agent");
 
+const USE_PROXY = true;
+const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0";
+
 /**
  * JTWC Product Archiver
  *
@@ -45,18 +48,20 @@ const SocksProxyAgent = require("axios-socks5-agent");
 **/
 const app = (async () => {
     const JTWC_RSS = "https://www.metoc.navy.mil/jtwc/rss/jtwc.rss";
-    const {httpAgent, httpsAgent} = new SocksProxyAgent({port: 51325});
-    const options = {
-        httpAgent,
-        httpsAgent,
+    let options = {
         headers: {
             // "User-Agent": "jtwc-archiver/1.0.0 (Wikipedia WikiProject Tropical Cyclones JTWC Archiver; wiki@chlod.net; https://wiki.chlod.net/jtwc/)",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0",
+            "User-Agent": USER_AGENT,
             "X-Contact": "Before blocking, please contact wiki@chlod.net.",
             "X-Email": "wiki@chlod.net",
             "X-Website": "https://en.wikipedia.org/wiki/User:Chlod"
         }
     };
+    
+    if (USE_PROXY) {
+        const {httpAgent, httpsAgent} = new SocksProxyAgent({port: 51325});
+        options = {...options, httpAgent, httpsAgent}
+    }
     
     let request;
     try {
@@ -135,6 +140,9 @@ const app = (async () => {
                     path.join(outPath, `latest-${product[1].replace(/^[.A-Z0-9\-]/g, "_")}`), 
                     productData.data
                 );
+                
+                // Intentionally wait 1 second.
+                await new Promise(res => { setTimeout( 1000, res); });
             } catch (e) {
                 console.log(`Failed to download product: ${e.message}`);
                 console.error(e);
