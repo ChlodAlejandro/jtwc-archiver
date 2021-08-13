@@ -100,6 +100,7 @@ const app = (async () => {
         };
         
         if (!checkUpdates()) {
+            console.log("No updates found.");
             process.exit();
         }
     }
