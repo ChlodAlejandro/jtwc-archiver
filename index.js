@@ -3,6 +3,7 @@ const fs = require("fs-jetpack");
 const cheerio = require("cheerio");
 const path = require("path");
 const moment = require("moment");
+const SocksProxyAgent = require("axios-socks5-agent");
 
 /**
  * JTWC Product Archiver
@@ -27,9 +28,14 @@ const moment = require("moment");
  *      |  +- latest-wp1520.gif            // Latest product file
  *      |
  *      +- prog            // Prognostic reasoning archives
+ *      |  |
+ *      |  +- 2020-09-29-160000-wp1520prog.txt // Example file
+ *      |  +- latest-wp1520prog.txt            // Latest product file
+ *      |
+ *      +- jmv             // JMV 3.0 Data
  *         |
- *         +- 2020-09-29-160000-wp1520prog.txt // Example file
- *         +- latest-wp1520prog.txt            // Latest product file
+ *         +- 2020-0-20-1600000-wp1620.tcw     // Example file
+ *         +- latest-wp1620.tcw                // Latest product file
  * 
  * Dedicated to WikiProject Tropical cyclones.
  * https://en.wikipedia.org/wiki/WP:WPTC
@@ -39,8 +45,28 @@ const moment = require("moment");
 **/
 const app = (async () => {
     const JTWC_RSS = "https://www.metoc.navy.mil/jtwc/rss/jtwc.rss";
+    const {httpAgent, httpsAgent} = new SocksProxyAgent({port: 51325});
+    const options = {
+        httpAgent,
+        httpsAgent,
+        headers: {
+            // "User-Agent": "jtwc-archiver/1.0.0 (Wikipedia WikiProject Tropical Cyclones JTWC Archiver; wiki@chlod.net; https://wiki.chlod.net/jtwc/)",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0",
+            "X-Contact": "Before blocking, please contact wiki@chlod.net.",
+            "X-Email": "wiki@chlod.net",
+            "X-Website": "https://en.wikipedia.org/wiki/User:Chlod"
+        }
+    };
     
-    const request = await axios(`${JTWC_RSS}?${Date.now()}`);
+    let request;
+    try {
+        request = await axios(`${JTWC_RSS}?${Date.now()}`, options);
+    } catch (e) {
+        console.log(`Could not get RSS data: ${e.message}`);
+        console.error(e);
+        process.exit();
+    }
+    
     const data = request.data
         .replace(/<!\[CDATA\[((?:.|\s)+?)\]\]>/gi, "$1");
     
@@ -89,7 +115,7 @@ const app = (async () => {
         while ((product = regex.exec(data)) != null) {
             try {
                 console.log(`Archiving ${product[0]} to ${product[1]}`);
-                const productData = await axios(product[0], {responseType: "arraybuffer"});
+                const productData = await axios(product[0], Object.assign(options, {responseType: "arraybuffer"}));
                 
                 const latest = path.join(outPath, `latest-${product[1].replace(/^[.A-Z0-9\-]/g, "_")}`);
                 if (fs.exists(latest)) {
@@ -110,7 +136,8 @@ const app = (async () => {
                     productData.data
                 );
             } catch (e) {
-                console.error("Failed to download product.");
+                console.log(`Failed to download product: ${e.message}`);
+                console.error(e);
             }
         }
     };
@@ -118,9 +145,9 @@ const app = (async () => {
     await archiveMatches("text", /https:\/\/.+?([^/]+web\.txt)/gi);  // TC Warning 
     await archiveMatches("gif", /https:\/\/.+?([^/]+\.gif)/gi);      // TC Graphic
     await archiveMatches("prog", /https:\/\/.+?([^/]+prog\.txt)/gi); // Prognostic Reasoning
-    await archiveMatches("jmv", /https:\/\/.+?([^/]+\.tcw)/gi);     // JMV 3.0 Data
+    await archiveMatches("jmv", /https:\/\/.+?([^/]+\.tcw)/gi);      // JMV 3.0 Data
     
     console.log("Archiving success.");
 });
 
-app().catch(e => {console.error("Failed to archive."); console.error(e); });
+app().catch(e => {console.log("Failed to archive."); console.error("Failed to archive."); console.error(e); });
