@@ -143,7 +143,7 @@ const app = (async () => {
                 );
                 
                 // Intentionally wait 1 second.
-                await new Promise(res => { setTimeout( 1000, res); });
+                await new Promise(res => { setTimeout( res, 1000 ); });
             } catch (e) {
                 console.log(`Failed to download product: ${e.message}`);
                 console.error(e);
