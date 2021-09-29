@@ -5,16 +5,15 @@
   "description": "Archives the JTWC product files.",
   "main": "index.js",
   "dependencies": {
+    "@chlodalejandro/socks-proxy-agent": "^6.1.2",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.3",
     "fs-jetpack": "^3.1.0",
-    "moment": "^2.29.0",
-    "socks-proxy-agent": "^6.0.0"
+    "moment": "^2.29.0"
   },
   "bin": {
     "jtwc-archiver": "./bin/jtwc-archiver"
   },
-  "devDependencies": {},
   "scripts": {
     "start": "node index.js",
     "jtwc-archiver": "node index.js",

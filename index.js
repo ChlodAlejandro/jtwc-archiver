@@ -3,7 +3,7 @@ const fs = require("fs-jetpack");
 const cheerio = require("cheerio");
 const path = require("path");
 const moment = require("moment");
-const SocksProxyAgent = require("socks-proxy-agent");
+const SocksProxyAgent = require("@chlodalejandro/socks-proxy-agent");
 
 const USE_PROXY = true;
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0";
@@ -59,8 +59,15 @@ const app = (async () => {
     };
     
     if (USE_PROXY) {
-        const proxy = new SocksProxyAgent("socks5://127.0.0.1:51325");
-        options = {...options, httpAgent: proxy, httpsAgent: proxy}
+        const proxy = new SocksProxyAgent({
+            host: "127.0.0.1",
+            port: "51325",
+            protocol: "socks5",
+            socket_options: {
+                family: 4
+            }
+        });
+        options = { ...options, httpAgent: proxy, httpsAgent: proxy };
     }
     
     let request;
