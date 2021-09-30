@@ -76,7 +76,7 @@ const app = (async () => {
     } catch (e) {
         console.log(`Could not get RSS data: ${e.message}`);
         console.error(e);
-        process.exit();
+        process.exit(2);
     }
     
     const data = request.data
@@ -153,6 +153,7 @@ const app = (async () => {
                 await new Promise(res => { setTimeout( res, 1000 ); });
             } catch (e) {
                 console.log(`Failed to download product: ${e.message}`);
+                console.error(`Failed to download product: ${e.message}`);
                 console.error(e);
             }
         }
@@ -166,4 +167,4 @@ const app = (async () => {
     console.log("Archiving success.");
 });
 
-app().catch(e => {console.log("Failed to archive."); console.error("Failed to archive."); console.error(e); });
+app().catch(e => {console.log("Failed to archive."); console.error("Failed to archive."); console.error(e); process.exit(4); });
