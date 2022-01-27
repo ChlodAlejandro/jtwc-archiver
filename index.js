@@ -3,9 +3,10 @@ const fs = require("fs-jetpack");
 const cheerio = require("cheerio");
 const path = require("path");
 const moment = require("moment");
+const axiosRetry = require("axios-retry");
 const SocksProxyAgent = require("@chlodalejandro/socks-proxy-agent");
 
-const USE_PROXY = true;
+const USE_PROXY = false;
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0";
 
 /**
@@ -57,6 +58,7 @@ const app = (async () => {
             "X-Website": "https://en.wikipedia.org/wiki/User:Chlod"
         }
     };
+    axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay});
     
     if (USE_PROXY) {
         const proxy = new SocksProxyAgent({
